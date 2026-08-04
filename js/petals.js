@@ -23,7 +23,7 @@
   let height = 0;
   let dpr = Math.min(window.devicePixelRatio || 1, 2);
 
-  const PETAL_COUNT = 26;
+  const PETAL_COUNT = 50;
   const petals = [];
 
   function resize() {
