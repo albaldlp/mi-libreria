@@ -1,0 +1,414 @@
+/* ===========================================================
+   La Librería de los Pétalos — estilos
+   Paleta: verde bosque (tejado), crema (pared), terracota (madera),
+   rosa sakura (pétalos), dorado (farolillos), tinta (texto)
+=========================================================== */
+
+:root{
+  --forest: #3b4a3a;
+  --forest-dark: #26302a;
+  --cream: #f4e9cf;
+  --paper: #faf3e1;
+  --paper-shadow: #e8d9b8;
+  --terracotta: #8a5a3b;
+  --terracotta-dark: #5e3b23;
+  --sakura: #f3b6c6;
+  --sakura-deep: #d9748e;
+  --gold: #d9a441;
+  --ink: #3a2f28;
+  --ink-soft: #6b5c4d;
+
+  --font-display: "Shippori Mincho", "Times New Roman", serif;
+  --font-body: "Zen Maru Gothic", "Hiragino Maru Gothic ProN", sans-serif;
+}
+
+*, *::before, *::after{ box-sizing: border-box; }
+
+html, body{
+  margin: 0;
+  padding: 0;
+  background: var(--forest-dark);
+  font-family: var(--font-body);
+  color: var(--ink);
+  height: 100%;
+  overflow: hidden;
+}
+
+:focus-visible{
+  outline: 3px solid var(--gold);
+  outline-offset: 3px;
+  border-radius: 6px;
+}
+
+/* ---------- Escena a pantalla completa ---------- */
+
+.scene-wrap{
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100dvh;
+}
+
+.scene{
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: var(--forest-dark);
+}
+
+.scene__bg-blur{
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 50% 42%;
+  filter: blur(50px) saturate(1.2) brightness(.8);
+  transform: scale(1.2);
+  pointer-events: none;
+  user-select: none;
+}
+
+.scene__bg{
+  position: absolute;
+  top: 0;
+  left: 0;
+  object-fit: contain;
+  user-select: none;
+  -webkit-user-drag: none;
+  pointer-events: none;
+  box-shadow: 0 0 80px 20px rgba(0,0,0,.35);
+}
+
+.scene__petals{
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+/* ---------- Cabecera flotante ---------- */
+
+.scene__header{
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  padding: clamp(18px, 4vw, 40px) clamp(16px, 4vw, 36px) clamp(46px, 9vw, 90px);
+  text-align: center;
+  color: var(--paper);
+  background: linear-gradient(180deg, rgba(20,20,15,.6) 0%, rgba(20,20,15,.22) 55%, transparent 100%);
+  pointer-events: none;
+  z-index: 3;
+}
+
+.scene__eyebrow{
+  margin: 0 0 4px;
+  font-family: var(--font-body);
+  font-size: clamp(10px, 1.4vw, 13px);
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--sakura);
+  opacity: .95;
+}
+
+.scene__title{
+  margin: 0 0 6px;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: clamp(20px, 4.2vw, 38px);
+  text-shadow: 0 2px 10px rgba(0,0,0,.5);
+  letter-spacing: .01em;
+}
+
+.scene__subtitle{
+  margin: 0 auto;
+  max-width: 46em;
+  font-size: clamp(11px, 1.5vw, 14px);
+  line-height: 1.5;
+  color: var(--cream);
+  text-shadow: 0 1px 6px rgba(0,0,0,.5);
+}
+
+/* ---------- Contador de progreso ---------- */
+
+.progress{
+  position: absolute;
+  right: clamp(12px, 2.4vw, 24px);
+  bottom: clamp(12px, 2.4vw, 24px);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 16px;
+  background: rgba(250, 243, 225, .92);
+  color: var(--ink);
+  border-radius: 999px;
+  font-size: clamp(11px, 1.4vw, 13px);
+  font-weight: 500;
+  box-shadow: 0 6px 18px rgba(0,0,0,.3);
+  z-index: 5;
+}
+
+.progress__icon{ font-size: 1.1em; }
+
+.hint{
+  position: absolute;
+  left: clamp(12px, 2.4vw, 24px);
+  bottom: clamp(12px, 2.4vw, 24px);
+  margin: 0;
+  max-width: min(60vw, 380px);
+  color: var(--ink);
+  background: rgba(250, 243, 225, .92);
+  padding: 9px 16px;
+  border-radius: 999px;
+  box-shadow: 0 6px 18px rgba(0,0,0,.3);
+  font-size: clamp(11px, 1.4vw, 13px);
+  z-index: 5;
+}
+
+/* ---------- Hotspots (libros escondidos) ---------- */
+
+.hotspots{
+  position: absolute;
+  inset: 0;
+}
+
+.book-spot{
+  position: absolute;
+  transform: translate(-50%, -50%);
+  width: var(--w, 34px);
+  height: var(--h, 34px);
+  display: grid;
+  place-items: center;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  filter: drop-shadow(0 2px 3px rgba(0,0,0,.35));
+  animation: bookFloat 3.6s ease-in-out infinite;
+  animation-delay: var(--delay, 0s);
+  z-index: 4;
+}
+
+.book-spot svg{
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  transition: transform .25s ease, filter .25s ease;
+}
+
+.book-spot:hover svg,
+.book-spot:focus-visible svg{
+  transform: scale(1.28) rotate(-4deg);
+  filter: drop-shadow(0 0 10px rgba(255, 223, 150, .9));
+}
+
+.book-spot::after{
+  content: "";
+  position: absolute;
+  inset: -40%;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255,224,150,.55) 0%, rgba(255,224,150,0) 70%);
+  opacity: 0;
+  transition: opacity .25s ease;
+  pointer-events: none;
+}
+
+.book-spot:hover::after,
+.book-spot:focus-visible::after{
+  opacity: 1;
+}
+
+.book-spot.found{
+  animation: none;
+}
+
+.book-spot.found svg{
+  filter: saturate(.6) brightness(1.05);
+}
+
+.book-spot.found .book-spot__check{
+  opacity: 1;
+  transform: scale(1);
+}
+
+.book-spot__check{
+  position: absolute;
+  top: -6px;
+  right: -8px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--sakura-deep);
+  color: #fff;
+  font-size: 10px;
+  line-height: 16px;
+  text-align: center;
+  opacity: 0;
+  transform: scale(.4);
+  transition: opacity .2s ease, transform .2s ease;
+}
+
+@keyframes bookFloat{
+  0%, 100%{ transform: translate(-50%, -50%) translateY(0) rotate(0deg); }
+  50%{ transform: translate(-50%, -50%) translateY(-4px) rotate(-2deg); }
+}
+
+/* ---------- Ficha del libro (modal) ---------- */
+
+.book-modal{
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .25s ease;
+}
+
+.book-modal.is-open{
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.book-modal__backdrop{
+  position: absolute;
+  inset: 0;
+  background: rgba(20, 16, 12, .6);
+  backdrop-filter: blur(3px);
+}
+
+.book-modal__card{
+  position: relative;
+  width: min(420px, 100%);
+  max-height: 85vh;
+  overflow-y: auto;
+  background:
+    radial-gradient(circle at 100% 0%, rgba(139,90,60,.08), transparent 45%),
+    var(--paper);
+  border-radius: 14px;
+  padding: 30px 28px 26px;
+  box-shadow: 0 30px 70px rgba(0,0,0,.5);
+  border: 1px solid var(--paper-shadow);
+  transform: translateY(18px) scale(.96);
+  transition: transform .3s cubic-bezier(.2,.8,.2,1);
+}
+
+.book-modal.is-open .book-modal__card{
+  transform: translateY(0) scale(1);
+}
+
+.book-modal__card::before{
+  content: "";
+  position: absolute;
+  top: 0; left: 26px;
+  width: 22px;
+  height: 46px;
+  background: var(--sakura-deep);
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 78%, 0 100%);
+  box-shadow: 0 3px 6px rgba(0,0,0,.25);
+}
+
+.book-modal__close{
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(58,47,40,.08);
+  color: var(--ink);
+  font-size: 14px;
+  cursor: pointer;
+  transition: background .2s ease;
+}
+.book-modal__close:hover{ background: rgba(58,47,40,.18); }
+
+.book-modal__seal{
+  position: absolute;
+  top: 22px;
+  right: 60px;
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  border: 2px solid var(--sakura-deep);
+  color: var(--sakura-deep);
+  display: grid;
+  place-items: center;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 13px;
+  transform: rotate(-8deg);
+  opacity: .9;
+}
+
+.book-modal__eyebrow{
+  margin: 10px 0 2px;
+  font-size: 11px;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--sakura-deep);
+}
+
+.book-modal__title{
+  margin: 0 0 2px;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: clamp(20px, 4vw, 26px);
+  color: var(--forest);
+  padding-right: 70px;
+}
+
+.book-modal__author{
+  margin: 0 0 14px;
+  font-size: 13px;
+  color: var(--ink-soft);
+  font-style: italic;
+}
+
+.book-modal__synopsis{
+  margin: 0 0 16px;
+  font-size: 14.5px;
+  line-height: 1.65;
+  color: var(--ink);
+}
+
+.book-modal__stars{
+  font-size: 18px;
+  letter-spacing: 2px;
+  color: var(--gold);
+}
+
+.star{ display: inline-block; position: relative; color: rgba(58,47,40,.2); }
+.star--full{ color: var(--gold); }
+.star--half{ color: rgba(58,47,40,.2); }
+.star--half-fill{
+  position: absolute;
+  inset: 0;
+  width: 50%;
+  overflow: hidden;
+  color: var(--gold);
+}
+
+/* ---------- Responsive ---------- */
+
+@media (max-width: 560px){
+  .scene{ border-radius: 12px; }
+  .progress{ padding: 6px 10px; }
+  .book-modal__card{ padding: 24px 20px 20px; }
+}
+
+/* ---------- Accesibilidad: reduce motion ---------- */
+
+@media (prefers-reduced-motion: reduce){
+  .book-spot{ animation: none; }
+  .book-modal__card{ transition: none; }
+  .scene__petals{ display: none; }
+}
