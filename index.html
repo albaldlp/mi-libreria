@@ -3,327 +3,525 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Mi Librería Garajera</title>
+<title>Mi Cafetería Garajera</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Permanent+Marker&family=Barlow+Condensed:wght@600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Kosugi+Maru&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
 
   /* ============================================================
-     PALETA Y TIPOS — no hace falta tocar esto, pero si algún día
-     quieres cambiar colores, están todos aquí arriba.
+     PALETA — sacada de la imagen de referencia: puertas verde
+     azulado, madera cálida, sakura rosa, tarros de terracota.
      ============================================================ */
   :root{
-    --azul-mono:   #2B3A4A;   /* fondo, como un mono de trabajo */
-    --carton:      #C9A876;   /* tono cartón */
-    --carton-osc:  #A9865A;
-    --papel:       #F7F1E3;   /* tarjetas, tipo ficha */
-    --tinta:       #23201B;   /* texto principal */
-    --mostaza:     #E3A439;   /* acento, cinta de precaución */
-    --rojo-etiqueta: #B5432C;
+    --crema:      #F6E9D0;
+    --teal:       #3B5D56;
+    --teal-osc:   #274038;
+    --sakura:     #F3B8C4;
+    --sakura-osc: #D98CA0;
+    --terracota:  #C97B4A;
+    --madera:     #8B6239;
+    --tinta:      #2E241A;
+    --dorado:     #E0B15C;
   }
 
   * { box-sizing: border-box; }
 
   body{
-    margin:0;
-    background: var(--azul-mono);
-    background-image:
-      repeating-linear-gradient(135deg, rgba(255,255,255,0.02) 0px, rgba(255,255,255,0.02) 2px, transparent 2px, transparent 40px);
-    color: var(--tinta);
+    margin: 0;
     font-family: 'Inter', sans-serif;
-    min-height: 100vh;
+    color: var(--tinta);
+    background: var(--teal-osc);
+    overflow-x: hidden;
   }
 
-  header{
-    padding: 56px 24px 40px;
-    text-align: center;
+  .titulo-display{ font-family: 'Kosugi Maru', sans-serif; }
+
+  /* ============================================================
+     PÉTALOS QUE CAEN — flotan sobre todo, todo el rato.
+     ============================================================ */
+  .petalo{
+    position: fixed;
+    top: -20px;
+    width: 12px;
+    height: 12px;
+    background: var(--sakura);
+    border-radius: 0 60% 0 60%;
+    opacity: 0.9;
+    pointer-events: none;
+    z-index: 60;
+    animation-name: caer;
+    animation-timing-function: linear;
   }
 
-  .eyebrow{
-    display:inline-block;
-    font-family:'Barlow Condensed', sans-serif;
-    font-weight:700;
-    letter-spacing: 0.25em;
-    text-transform: uppercase;
-    font-size: 13px;
-    color: var(--mostaza);
-    background: rgba(0,0,0,0.25);
-    padding: 6px 14px;
-    border-radius: 3px;
-    margin-bottom: 18px;
+  @keyframes caer{
+    to{ transform: translateY(105vh) translateX(var(--deriva, 40px)) rotate(360deg); opacity: 0.15; }
   }
 
-  h1{
-    font-family: 'Permanent Marker', cursive;
-    font-weight: 400;
-    font-size: clamp(2.4rem, 6vw, 4rem);
-    color: var(--papel);
-    margin: 0 0 10px;
-    transform: rotate(-1.5deg);
-  }
-
-  .subtitulo{
-    color: rgba(247,241,227,0.65);
-    font-size: 16px;
-    max-width: 480px;
-    margin: 0 auto;
-  }
-
-  /* ---------- Buscador y filtros ---------- */
-  .controles{
-    max-width: 900px;
-    margin: 0 auto 40px;
-    padding: 0 24px;
+  /* ============================================================
+     ESCENA 1: ENTRADA CON CORTINA DE CUENTAS
+     ============================================================ */
+  #escena-entrada{
+    position: fixed;
+    inset: 0;
+    z-index: 90;
+    background:
+      radial-gradient(circle at 50% 15%, rgba(224,177,92,0.25), transparent 60%),
+      linear-gradient(var(--teal), var(--teal-osc));
     display: flex;
-    flex-wrap: wrap;
-    gap: 12px;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    transition: opacity 1s ease, visibility 1s ease;
+  }
+
+  #escena-entrada.entrado{
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+  }
+
+  .rotulo-entrada{
+    text-align: center;
+    color: var(--crema);
+    margin: 36px 0 8px;
+  }
+  .rotulo-entrada h1{ font-size: clamp(1.8rem, 5vw, 2.6rem); margin: 0 0 6px; }
+  .rotulo-entrada p{ margin: 0; font-size: 14px; color: rgba(246,233,208,0.75); }
+
+  #cortina{
+    position: relative;
+    flex: 1;
+    width: 100%;
+    display: flex;
     justify-content: center;
-  }
-
-  #buscador{
-    flex: 1 1 260px;
-    max-width: 360px;
-    padding: 12px 16px;
-    border: 2px solid var(--carton-osc);
-    border-radius: 4px;
-    background: var(--papel);
-    font-family: 'Inter', sans-serif;
-    font-size: 15px;
-    color: var(--tinta);
-  }
-  #buscador:focus{ outline: 3px solid var(--mostaza); outline-offset: 1px; }
-
-  .filtro-categoria{
-    padding: 10px 16px;
-    border: 2px solid var(--carton-osc);
-    border-radius: 4px;
-    background: var(--carton);
-    color: var(--tinta);
-    font-family: 'Barlow Condensed', sans-serif;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    font-size: 14px;
+    gap: 14px;
+    padding-top: 24px;
     cursor: pointer;
+    touch-action: none;
   }
-  .filtro-categoria.activo{
-    background: var(--mostaza);
-    border-color: var(--mostaza);
-  }
-  .filtro-categoria:focus-visible{ outline: 3px solid var(--papel); }
 
-  /* ---------- Cuadrícula de libros ---------- */
-  main{
+  .hilo{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    transform-origin: top center;
+    transition: transform 0.4s cubic-bezier(.34,1.6,.5,1);
+  }
+  .hilo.tocado{ transform: rotate(var(--angulo, 8deg)); }
+
+  .cuenta{
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    box-shadow: inset -3px -3px 4px rgba(0,0,0,0.25), inset 2px 2px 3px rgba(255,255,255,0.3);
+  }
+
+  #boton-entrar{
+    font-family: 'Kosugi Maru', sans-serif;
+    font-size: 16px;
+    color: var(--tinta);
+    background: var(--crema);
+    border: none;
+    border-radius: 999px;
+    padding: 12px 30px;
+    margin: 22px 0 34px;
+    cursor: pointer;
+    box-shadow: 0 6px 16px rgba(0,0,0,0.35);
+  }
+  #boton-entrar:hover{ background: var(--sakura); }
+  #boton-entrar:focus-visible{ outline: 3px solid var(--dorado); outline-offset: 3px; }
+
+  /* ============================================================
+     ESCENA 2: LA CAFETERÍA — imagen estática de fondo
+     ============================================================ */
+  #cafeteria{
+    position: relative;
+    min-height: 100vh;
+    padding: 36px 16px 60px;
+    background: var(--crema);
+  }
+
+  header.encabezado{
+    text-align: center;
+    margin-bottom: 28px;
+  }
+  header.encabezado h1{
+    font-size: clamp(1.8rem, 5vw, 2.6rem);
+    margin: 0 0 8px;
+    color: var(--teal-osc);
+  }
+  header.encabezado p{ margin: 0; color: #6b5a42; font-size: 15px; }
+
+  /* contenedor de la imagen: mantiene su proporción real,
+     así los libros escondidos quedan siempre en el sitio correcto */
+  .escena-imagen{
+    position: relative;
     max-width: 1100px;
     margin: 0 auto;
-    padding: 0 24px 80px;
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-    gap: 28px;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.35);
   }
 
-  .ficha{
-    background: var(--papel);
-    border-radius: 3px;
-    padding: 18px 16px 20px;
-    position: relative;
-    box-shadow: 0 8px 16px rgba(0,0,0,0.25);
-    transition: transform 0.15s ease;
-  }
-  .ficha:nth-child(3n+1){ transform: rotate(-1deg); }
-  .ficha:nth-child(3n+2){ transform: rotate(0.8deg); }
-  .ficha:nth-child(3n){ transform: rotate(-0.4deg); }
-  .ficha:hover{ transform: scale(1.03) rotate(0deg); }
-
-  /* etiqueta de "cinta adhesiva" arriba de cada ficha */
-  .ficha::before{
-    content:"";
-    position:absolute;
-    top:-10px; left:50%;
-    transform: translateX(-50%) rotate(-3deg);
-    width: 60px; height: 20px;
-    background: rgba(227,164,57,0.55);
-    border: 1px solid rgba(0,0,0,0.05);
+  .escena-imagen img{
+    display: block;
+    width: 100%;
+    height: auto;
   }
 
-  .categoria-tag{
-    display:inline-block;
-    font-family:'Barlow Condensed', sans-serif;
-    font-weight:700;
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
-    font-size: 12px;
-    color: var(--papel);
-    background: var(--rojo-etiqueta);
-    padding: 3px 9px;
+  /* --- libros escondidos, con la misma paleta que la ilustración --- */
+  .libro-oculto{
+    position: absolute;
+    width: 3.2%;
+    aspect-ratio: 3 / 2;
+    background: var(--sakura-osc);
+    border: 1px solid rgba(255,255,255,0.6);
     border-radius: 2px;
-    margin-bottom: 10px;
+    cursor: pointer;
+    box-shadow: 0 0 0 2px rgba(224,177,92,0.0), 0 2px 6px rgba(0,0,0,0.35);
+    opacity: 0.88;
+    transition: transform 0.15s ease, box-shadow 0.15s ease, opacity 0.15s ease;
   }
-
-  .ficha h2{
-    font-family: 'Barlow Condensed', sans-serif;
-    font-size: 22px;
-    font-weight: 700;
-    margin: 0 0 4px;
-    line-height: 1.15;
+  .libro-oculto:hover, .libro-oculto:focus-visible{
+    transform: scale(1.3) rotate(-4deg);
+    box-shadow: 0 0 0 3px var(--dorado), 0 4px 10px rgba(0,0,0,0.4);
+    opacity: 1;
   }
+  .libro-oculto:focus-visible{ outline: none; }
 
-  .autor{
-    font-size: 13px;
-    color: #6b5f4a;
-    margin: 0 0 12px;
-    font-style: italic;
-  }
-
-  .descripcion{
-    font-size: 14px;
-    line-height: 1.5;
-    margin: 0;
-    color: #3d372c;
-  }
-
-  .sin-resultados{
-    grid-column: 1 / -1;
+  .pista{
     text-align: center;
-    color: rgba(247,241,227,0.7);
-    font-family:'Barlow Condensed', sans-serif;
+    color: #6b5a42;
+    font-size: 13px;
+    margin-top: 18px;
+  }
+
+  /* ============================================================
+     POPUP / MODAL DE CADA LIBRO
+     ============================================================ */
+  #fondo-modal{
+    position: fixed;
+    inset: 0;
+    background: rgba(39,64,56,0.6);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 200;
+    padding: 20px;
+  }
+  #fondo-modal.visible{ display: flex; }
+
+  .tarjeta-modal{
+    background: var(--crema);
+    border-radius: 14px;
+    max-width: 420px;
+    width: 100%;
+    padding: 26px;
+    position: relative;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.4);
+    border: 3px solid var(--dorado);
+  }
+
+  #cerrar-modal{
+    position: absolute;
+    top: 12px; right: 14px;
+    background: none;
+    border: none;
     font-size: 20px;
-    padding: 40px 0;
+    cursor: pointer;
+    color: var(--teal-osc);
+  }
+  #cerrar-modal:focus-visible{ outline: 2px solid var(--dorado); }
+
+  .portada-modal{
+    width: 90px; height: 130px;
+    margin: 0 auto 14px;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Kosugi Maru', sans-serif;
+    font-size: 28px;
+    color: var(--crema);
+    box-shadow: 0 6px 14px rgba(0,0,0,0.3);
+    object-fit: cover;
+  }
+
+  .tarjeta-modal h2{
+    text-align: center;
+    margin: 0 0 4px;
+    font-size: 22px;
+    color: var(--teal-osc);
+  }
+  .autor-modal{
+    text-align: center;
+    font-style: italic;
+    color: #7a6650;
+    margin: 0 0 14px;
+    font-size: 14px;
+  }
+  .sinopsis-modal{
+    font-size: 14px;
+    line-height: 1.55;
+    color: #4a3c2c;
+    margin: 0 0 14px;
+  }
+  .puntuacion-modal{
+    text-align: center;
+    font-size: 20px;
+    letter-spacing: 3px;
+    color: var(--terracota);
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    .petalo{ animation: none; display: none; }
   }
 
 </style>
 </head>
 <body>
 
-<header>
-  <span class="eyebrow">Colección personal</span>
-  <h1>Mi Librería Garajera</h1>
-  <p class="subtitulo">Los libros que tengo por casa, ordenados como en una caja de garaje. Busca o filtra por categoría.</p>
-</header>
-
-<div class="controles">
-  <input type="text" id="buscador" placeholder="Buscar por título o autor...">
-  <div id="filtros"></div>
+<!-- ============================================================
+     ESCENA DE ENTRADA: cortina de cuentas musical
+     ============================================================ -->
+<div id="escena-entrada">
+  <div class="rotulo-entrada">
+    <h1 class="titulo-display">喫茶店 · Mi Cafetería</h1>
+    <p>Mueve el cursor sobre la cortina para "tocarla"</p>
+  </div>
+  <div id="cortina"></div>
+  <button id="boton-entrar">Entrar en la cafetería →</button>
 </div>
 
-<main id="contenedor-libros"></main>
+<!-- ============================================================
+     ESCENA PRINCIPAL: imagen estática + libros escondidos
+     ============================================================ -->
+<div id="cafeteria">
+  <header class="encabezado">
+    <h1 class="titulo-display">Mi Cafetería Garajera</h1>
+    <p>Hay libros escondidos en la escena. Búscalos y haz clic.</p>
+  </header>
+
+  <div class="escena-imagen">
+    <!--
+      La imagen se llama "cafeteria.jpg" y tiene que estar SIEMPRE
+      en la misma carpeta que este index.html al subirla a GitHub,
+      si no, no se verá.
+    -->
+    <img src="cafeteria.jpg" alt="Fachada de la cafetería japonesa con mesas, sillas y estanterías">
+
+    <!--
+      Cada libro-oculto se coloca con "top" y "left" en PORCENTAJE
+      (0% a 100%) sobre la imagen, así se queda bien puesto en
+      cualquier pantalla. Ajusta los números para moverlos.
+    -->
+    <div class="libro-oculto" data-libro="0" style="top: 78%; left: 22%;" tabindex="0" aria-label="Libro escondido 1"></div>
+    <div class="libro-oculto" data-libro="1" style="top: 74%; left: 46%;" tabindex="0" aria-label="Libro escondido 2"></div>
+    <div class="libro-oculto" data-libro="2" style="top: 80%; left: 62%;" tabindex="0" aria-label="Libro escondido 3"></div>
+    <div class="libro-oculto" data-libro="3" style="top: 47%; left: 71%;" tabindex="0" aria-label="Libro escondido 4"></div>
+    <div class="libro-oculto" data-libro="4" style="top: 33%; left: 78%;" tabindex="0" aria-label="Libro escondido 5"></div>
+  </div>
+
+  <p class="pista">5 libros escondidos. ¿Los has encontrado todos?</p>
+</div>
+
+<!-- ============================================================
+     MODAL / POPUP DEL LIBRO
+     ============================================================ -->
+<div id="fondo-modal">
+  <div class="tarjeta-modal">
+    <button id="cerrar-modal" aria-label="Cerrar">✕</button>
+    <div class="portada-modal" id="portada-modal"></div>
+    <h2 id="titulo-modal"></h2>
+    <p class="autor-modal" id="autor-modal"></p>
+    <p class="sinopsis-modal" id="sinopsis-modal"></p>
+    <p class="puntuacion-modal" id="puntuacion-modal"></p>
+  </div>
+</div>
 
 <script>
 
   /* ============================================================
-     👇 ESTA ES LA ÚNICA PARTE QUE TIENES QUE TOCAR 👇
+     👇 ESTA ES LA PARTE QUE TIENES QUE TOCAR 👇
 
-     Añade, borra o edita libros aquí. Cada libro es un bloque
-     entre { } y hay que separarlos con una coma.
+     Un libro por cada "libro-oculto" del HTML de arriba
+     (el índice 0 es el primero, 1 el segundo, etc).
 
-     - titulo: el nombre del libro
-     - autor: quién lo escribió
-     - categoria: la etiqueta roja (úsala para agrupar, ej: "Novela", "Ensayo", "Cómic"...)
-     - descripcion: una o dos frases sobre el libro
-
-     Cuando termines de editar, guarda el archivo y ya está.
+     - portada: déjalo en "" para usar un color con las iniciales,
+       o pon la URL de una imagen para mostrar la portada real.
      ============================================================ */
 
   const libros = [
     {
       titulo: "Cien años de soledad",
       autor: "Gabriel García Márquez",
-      categoria: "Novela",
-      descripcion: "La historia de la familia Buendía en el pueblo mítico de Macondo."
+      sinopsis: "La historia de la familia Buendía en el pueblo mítico de Macondo, a lo largo de siete generaciones.",
+      puntuacion: 5,
+      portada: ""
     },
     {
       titulo: "Sapiens",
       autor: "Yuval Noah Harari",
-      categoria: "Ensayo",
-      descripcion: "Un repaso a la historia de la humanidad desde la Edad de Piedra hasta hoy."
+      sinopsis: "Un repaso a la historia de la humanidad desde la Edad de Piedra hasta la actualidad.",
+      puntuacion: 4,
+      portada: ""
     },
     {
       titulo: "El Eternauta",
       autor: "Héctor Germán Oesterheld",
-      categoria: "Cómic",
-      descripcion: "Clásico del cómic argentino sobre una invasión alienígena en Buenos Aires."
+      sinopsis: "Clásico del cómic argentino sobre una invasión alienígena en Buenos Aires.",
+      puntuacion: 5,
+      portada: ""
     },
     {
       titulo: "Rayuela",
       autor: "Julio Cortázar",
-      categoria: "Novela",
-      descripcion: "Una novela que se puede leer en varios órdenes distintos, a elección del lector."
+      sinopsis: "Una novela que se puede leer en varios órdenes distintos, a elección del lector.",
+      puntuacion: 4,
+      portada: ""
     },
     {
       titulo: "Persépolis",
       autor: "Marjane Satrapi",
-      categoria: "Cómic",
-      descripcion: "Novela gráfica autobiográfica sobre crecer durante la revolución iraní."
-    },
-    {
-      titulo: "Una breve historia del tiempo",
-      autor: "Stephen Hawking",
-      categoria: "Ensayo",
-      descripcion: "Divulgación sobre el origen del universo, los agujeros negros y el tiempo."
+      sinopsis: "Novela gráfica autobiográfica sobre crecer durante la revolución iraní.",
+      puntuacion: 5,
+      portada: ""
     }
   ];
 
   /* ============================================================
-     👆 A partir de aquí es el "motor" que pinta las fichas.
-     No hace falta entenderlo para usar la plantilla, pero si
-     algún día quieres aprender, es un buen sitio para empezar
-     a leer código real.
+     👆 A partir de aquí es el "motor". No hace falta tocarlo.
      ============================================================ */
 
-  const contenedor = document.getElementById('contenedor-libros');
-  const buscador = document.getElementById('buscador');
-  const filtrosDiv = document.getElementById('filtros');
+  /* ---------- Pétalos cayendo ---------- */
+  function crearPetalo(){
+    const petalo = document.createElement('div');
+    petalo.className = 'petalo';
+    const inicioX = Math.random() * window.innerWidth;
+    const duracion = 6 + Math.random() * 6;
+    const deriva = (Math.random() * 160 - 80) + 'px';
+    petalo.style.left = inicioX + 'px';
+    petalo.style.setProperty('--deriva', deriva);
+    petalo.style.animationDuration = duracion + 's';
+    petalo.style.background = Math.random() > 0.5 ? 'var(--sakura)' : '#ffffff';
+    document.body.appendChild(petalo);
+    setTimeout(() => petalo.remove(), duracion * 1000);
+  }
+  setInterval(crearPetalo, 400);
 
-  const categorias = ["Todos", ...new Set(libros.map(l => l.categoria))];
-  let categoriaActiva = "Todos";
+  /* ---------- Cortina de cuentas ---------- */
+  const cortina = document.getElementById('cortina');
+  const numHilos = 14;
+  const coloresCuentas = ['#F3B8C4', '#3B5D56', '#F6E9D0', '#E0B15C', '#FFFFFF'];
+  const notas = [261.63, 293.66, 329.63, 392.00, 440.00, 523.25, 587.33, 659.25];
 
-  function pintarFiltros(){
-    filtrosDiv.innerHTML = "";
-    categorias.forEach(cat => {
-      const btn = document.createElement('button');
-      btn.textContent = cat;
-      btn.className = "filtro-categoria" + (cat === categoriaActiva ? " activo" : "");
-      btn.addEventListener('click', () => {
-        categoriaActiva = cat;
-        pintarFiltros();
-        pintarLibros();
-      });
-      filtrosDiv.appendChild(btn);
-    });
+  for(let i = 0; i < numHilos; i++){
+    const hilo = document.createElement('div');
+    hilo.className = 'hilo';
+    hilo.dataset.nota = notas[i % notas.length];
+    const numCuentas = 6 + Math.floor(Math.random() * 3);
+    for(let j = 0; j < numCuentas; j++){
+      const cuenta = document.createElement('div');
+      cuenta.className = 'cuenta';
+      cuenta.style.background = coloresCuentas[Math.floor(Math.random() * coloresCuentas.length)];
+      hilo.appendChild(cuenta);
+    }
+    cortina.appendChild(hilo);
   }
 
-  function pintarLibros(){
-    const texto = buscador.value.trim().toLowerCase();
-    const filtrados = libros.filter(l => {
-      const coincideTexto = l.titulo.toLowerCase().includes(texto) || l.autor.toLowerCase().includes(texto);
-      const coincideCategoria = categoriaActiva === "Todos" || l.categoria === categoriaActiva;
-      return coincideTexto && coincideCategoria;
+  let contextoAudio = null;
+  function obtenerContexto(){
+    if(!contextoAudio){
+      contextoAudio = new (window.AudioContext || window.webkitAudioContext)();
+    }
+    return contextoAudio;
+  }
+
+  function tocarNota(frecuencia){
+    try{
+      const ctx = obtenerContexto();
+      const ahora = ctx.currentTime;
+      const osc = ctx.createOscillator();
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(frecuencia, ahora);
+      const ganancia = ctx.createGain();
+      ganancia.gain.setValueAtTime(0.0001, ahora);
+      ganancia.gain.linearRampToValueAtTime(0.18, ahora + 0.015);
+      ganancia.gain.exponentialRampToValueAtTime(0.0001, ahora + 0.8);
+      osc.connect(ganancia).connect(ctx.destination);
+      osc.start(ahora);
+      osc.stop(ahora + 0.8);
+    }catch(error){
+      console.log('El audio no está disponible en este navegador', error);
+    }
+  }
+
+  let ultimoHiloTocado = null;
+  cortina.addEventListener('pointermove', (evento) => {
+    const objetivo = evento.target.closest('.hilo');
+    if(!objetivo || objetivo === ultimoHiloTocado) return;
+    ultimoHiloTocado = objetivo;
+
+    const angulo = (Math.random() * 16 - 8).toFixed(1) + 'deg';
+    objetivo.style.setProperty('--angulo', angulo);
+    objetivo.classList.add('tocado');
+    tocarNota(parseFloat(objetivo.dataset.nota));
+
+    setTimeout(() => objetivo.classList.remove('tocado'), 400);
+  });
+  cortina.addEventListener('pointerleave', () => { ultimoHiloTocado = null; });
+
+  /* ---------- Entrar en la cafetería ---------- */
+  document.getElementById('boton-entrar').addEventListener('click', () => {
+    document.getElementById('escena-entrada').classList.add('entrado');
+  });
+
+  /* ---------- Modal de cada libro ---------- */
+  const fondoModal = document.getElementById('fondo-modal');
+  const iniciales = (texto) => texto.split(' ').map(p => p[0]).slice(0,2).join('').toUpperCase();
+  const coloresPortada = ['#3B5D56', '#D98CA0', '#C97B4A', '#E0B15C', '#8B6239'];
+
+  document.querySelectorAll('.libro-oculto').forEach(elemento => {
+    elemento.addEventListener('click', () => abrirModal(elemento.dataset.libro));
+    elemento.addEventListener('keydown', (evento) => {
+      if(evento.key === 'Enter' || evento.key === ' '){
+        evento.preventDefault();
+        abrirModal(elemento.dataset.libro);
+      }
     });
+  });
 
-    contenedor.innerHTML = "";
+  function abrirModal(indice){
+    const libro = libros[indice];
+    if(!libro) return;
 
-    if(filtrados.length === 0){
-      contenedor.innerHTML = '<p class="sin-resultados">No hay libros que coincidan con la búsqueda.</p>';
-      return;
+    document.getElementById('titulo-modal').textContent = libro.titulo;
+    document.getElementById('autor-modal').textContent = libro.autor;
+    document.getElementById('sinopsis-modal').textContent = libro.sinopsis;
+    document.getElementById('puntuacion-modal').textContent = '★'.repeat(libro.puntuacion) + '☆'.repeat(5 - libro.puntuacion);
+
+    const portada = document.getElementById('portada-modal');
+    if(libro.portada){
+      portada.style.background = 'none';
+      portada.innerHTML = `<img src="${libro.portada}" alt="Portada de ${libro.titulo}" style="width:100%;height:100%;border-radius:4px;object-fit:cover;">`;
+    } else {
+      portada.style.background = coloresPortada[indice % coloresPortada.length];
+      portada.innerHTML = iniciales(libro.titulo);
     }
 
-    filtrados.forEach(libro => {
-      const ficha = document.createElement('article');
-      ficha.className = "ficha";
-      ficha.innerHTML = `
-        <span class="categoria-tag">${libro.categoria}</span>
-        <h2>${libro.titulo}</h2>
-        <p class="autor">${libro.autor}</p>
-        <p class="descripcion">${libro.descripcion}</p>
-      `;
-      contenedor.appendChild(ficha);
-    });
+    fondoModal.classList.add('visible');
   }
 
-  buscador.addEventListener('input', pintarLibros);
-
-  pintarFiltros();
-  pintarLibros();
+  document.getElementById('cerrar-modal').addEventListener('click', () => {
+    fondoModal.classList.remove('visible');
+  });
+  fondoModal.addEventListener('click', (evento) => {
+    if(evento.target === fondoModal) fondoModal.classList.remove('visible');
+  });
+  document.addEventListener('keydown', (evento) => {
+    if(evento.key === 'Escape') fondoModal.classList.remove('visible');
+  });
 
 </script>
 </body>
