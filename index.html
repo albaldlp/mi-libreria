@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mi Librería Garajera</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Permanent+Marker&family=Barlow+Condensed:wght@600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+
+  /* ============================================================
+     PALETA Y TIPOS — no hace falta tocar esto, pero si algún día
+     quieres cambiar colores, están todos aquí arriba.
+     ============================================================ */
+  :root{
+    --azul-mono:   #2B3A4A;   /* fondo, como un mono de trabajo */
+    --carton:      #C9A876;   /* tono cartón */
+    --carton-osc:  #A9865A;
+    --papel:       #F7F1E3;   /* tarjetas, tipo ficha */
+    --tinta:       #23201B;   /* texto principal */
+    --mostaza:     #E3A439;   /* acento, cinta de precaución */
+    --rojo-etiqueta: #B5432C;
+  }
+
+  * { box-sizing: border-box; }
+
+  body{
+    margin:0;
+    background: var(--azul-mono);
+    background-image:
+      repeating-linear-gradient(135deg, rgba(255,255,255,0.02) 0px, rgba(255,255,255,0.02) 2px, transparent 2px, transparent 40px);
+    color: var(--tinta);
+    font-family: 'Inter', sans-serif;
+    min-height: 100vh;
+  }
+
+  header{
+    padding: 56px 24px 40px;
+    text-align: center;
+  }
+
+  .eyebrow{
+    display:inline-block;
+    font-family:'Barlow Condensed', sans-serif;
+    font-weight:700;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    font-size: 13px;
+    color: var(--mostaza);
+    background: rgba(0,0,0,0.25);
+    padding: 6px 14px;
+    border-radius: 3px;
+    margin-bottom: 18px;
+  }
+
+  h1{
+    font-family: 'Permanent Marker', cursive;
+    font-weight: 400;
+    font-size: clamp(2.4rem, 6vw, 4rem);
+    color: var(--papel);
+    margin: 0 0 10px;
+    transform: rotate(-1.5deg);
+  }
+
+  .subtitulo{
+    color: rgba(247,241,227,0.65);
+    font-size: 16px;
+    max-width: 480px;
+    margin: 0 auto;
+  }
+
+  /* ---------- Buscador y filtros ---------- */
+  .controles{
+    max-width: 900px;
+    margin: 0 auto 40px;
+    padding: 0 24px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    justify-content: center;
+  }
+
+  #buscador{
+    flex: 1 1 260px;
+    max-width: 360px;
+    padding: 12px 16px;
+    border: 2px solid var(--carton-osc);
+    border-radius: 4px;
+    background: var(--papel);
+    font-family: 'Inter', sans-serif;
+    font-size: 15px;
+    color: var(--tinta);
+  }
+  #buscador:focus{ outline: 3px solid var(--mostaza); outline-offset: 1px; }
+
+  .filtro-categoria{
+    padding: 10px 16px;
+    border: 2px solid var(--carton-osc);
+    border-radius: 4px;
+    background: var(--carton);
+    color: var(--tinta);
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-size: 14px;
+    cursor: pointer;
+  }
+  .filtro-categoria.activo{
+    background: var(--mostaza);
+    border-color: var(--mostaza);
+  }
+  .filtro-categoria:focus-visible{ outline: 3px solid var(--papel); }
+
+  /* ---------- Cuadrícula de libros ---------- */
+  main{
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 0 24px 80px;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 28px;
+  }
+
+  .ficha{
+    background: var(--papel);
+    border-radius: 3px;
+    padding: 18px 16px 20px;
+    position: relative;
+    box-shadow: 0 8px 16px rgba(0,0,0,0.25);
+    transition: transform 0.15s ease;
+  }
+  .ficha:nth-child(3n+1){ transform: rotate(-1deg); }
+  .ficha:nth-child(3n+2){ transform: rotate(0.8deg); }
+  .ficha:nth-child(3n){ transform: rotate(-0.4deg); }
+  .ficha:hover{ transform: scale(1.03) rotate(0deg); }
+
+  /* etiqueta de "cinta adhesiva" arriba de cada ficha */
+  .ficha::before{
+    content:"";
+    position:absolute;
+    top:-10px; left:50%;
+    transform: translateX(-50%) rotate(-3deg);
+    width: 60px; height: 20px;
+    background: rgba(227,164,57,0.55);
+    border: 1px solid rgba(0,0,0,0.05);
+  }
+
+  .categoria-tag{
+    display:inline-block;
+    font-family:'Barlow Condensed', sans-serif;
+    font-weight:700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    font-size: 12px;
+    color: var(--papel);
+    background: var(--rojo-etiqueta);
+    padding: 3px 9px;
+    border-radius: 2px;
+    margin-bottom: 10px;
+  }
+
+  .ficha h2{
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 22px;
+    font-weight: 700;
+    margin: 0 0 4px;
+    line-height: 1.15;
+  }
+
+  .autor{
+    font-size: 13px;
+    color: #6b5f4a;
+    margin: 0 0 12px;
+    font-style: italic;
+  }
+
+  .descripcion{
+    font-size: 14px;
+    line-height: 1.5;
+    margin: 0;
+    color: #3d372c;
+  }
+
+  .sin-resultados{
+    grid-column: 1 / -1;
+    text-align: center;
+    color: rgba(247,241,227,0.7);
+    font-family:'Barlow Condensed', sans-serif;
+    font-size: 20px;
+    padding: 40px 0;
+  }
+
+</style>
+</head>
+<body>
+
+<header>
+  <span class="eyebrow">Colección personal</span>
+  <h1>Mi Librería Garajera</h1>
+  <p class="subtitulo">Los libros que tengo por casa, ordenados como en una caja de garaje. Busca o filtra por categoría.</p>
+</header>
+
+<div class="controles">
+  <input type="text" id="buscador" placeholder="Buscar por título o autor...">
+  <div id="filtros"></div>
+</div>
+
+<main id="contenedor-libros"></main>
+
+<script>
+
+  /* ============================================================
+     👇 ESTA ES LA ÚNICA PARTE QUE TIENES QUE TOCAR 👇
+
+     Añade, borra o edita libros aquí. Cada libro es un bloque
+     entre { } y hay que separarlos con una coma.
+
+     - titulo: el nombre del libro
+     - autor: quién lo escribió
+     - categoria: la etiqueta roja (úsala para agrupar, ej: "Novela", "Ensayo", "Cómic"...)
+     - descripcion: una o dos frases sobre el libro
+
+     Cuando termines de editar, guarda el archivo y ya está.
+     ============================================================ */
+
+  const libros = [
+    {
+      titulo: "Cien años de soledad",
+      autor: "Gabriel García Márquez",
+      categoria: "Novela",
+      descripcion: "La historia de la familia Buendía en el pueblo mítico de Macondo."
+    },
+    {
+      titulo: "Sapiens",
+      autor: "Yuval Noah Harari",
+      categoria: "Ensayo",
+      descripcion: "Un repaso a la historia de la humanidad desde la Edad de Piedra hasta hoy."
+    },
+    {
+      titulo: "El Eternauta",
+      autor: "Héctor Germán Oesterheld",
+      categoria: "Cómic",
+      descripcion: "Clásico del cómic argentino sobre una invasión alienígena en Buenos Aires."
+    },
+    {
+      titulo: "Rayuela",
+      autor: "Julio Cortázar",
+      categoria: "Novela",
+      descripcion: "Una novela que se puede leer en varios órdenes distintos, a elección del lector."
+    },
+    {
+      titulo: "Persépolis",
+      autor: "Marjane Satrapi",
+      categoria: "Cómic",
+      descripcion: "Novela gráfica autobiográfica sobre crecer durante la revolución iraní."
+    },
+    {
+      titulo: "Una breve historia del tiempo",
+      autor: "Stephen Hawking",
+      categoria: "Ensayo",
+      descripcion: "Divulgación sobre el origen del universo, los agujeros negros y el tiempo."
+    }
+  ];
+
+  /* ============================================================
+     👆 A partir de aquí es el "motor" que pinta las fichas.
+     No hace falta entenderlo para usar la plantilla, pero si
+     algún día quieres aprender, es un buen sitio para empezar
+     a leer código real.
+     ============================================================ */
+
+  const contenedor = document.getElementById('contenedor-libros');
+  const buscador = document.getElementById('buscador');
+  const filtrosDiv = document.getElementById('filtros');
+
+  const categorias = ["Todos", ...new Set(libros.map(l => l.categoria))];
+  let categoriaActiva = "Todos";
+
+  function pintarFiltros(){
+    filtrosDiv.innerHTML = "";
+    categorias.forEach(cat => {
+      const btn = document.createElement('button');
+      btn.textContent = cat;
+      btn.className = "filtro-categoria" + (cat === categoriaActiva ? " activo" : "");
+      btn.addEventListener('click', () => {
+        categoriaActiva = cat;
+        pintarFiltros();
+        pintarLibros();
+      });
+      filtrosDiv.appendChild(btn);
+    });
+  }
+
+  function pintarLibros(){
+    const texto = buscador.value.trim().toLowerCase();
+    const filtrados = libros.filter(l => {
+      const coincideTexto = l.titulo.toLowerCase().includes(texto) || l.autor.toLowerCase().includes(texto);
+      const coincideCategoria = categoriaActiva === "Todos" || l.categoria === categoriaActiva;
+      return coincideTexto && coincideCategoria;
+    });
+
+    contenedor.innerHTML = "";
+
+    if(filtrados.length === 0){
+      contenedor.innerHTML = '<p class="sin-resultados">No hay libros que coincidan con la búsqueda.</p>';
+      return;
+    }
+
+    filtrados.forEach(libro => {
+      const ficha = document.createElement('article');
+      ficha.className = "ficha";
+      ficha.innerHTML = `
+        <span class="categoria-tag">${libro.categoria}</span>
+        <h2>${libro.titulo}</h2>
+        <p class="autor">${libro.autor}</p>
+        <p class="descripcion">${libro.descripcion}</p>
+      `;
+      contenedor.appendChild(ficha);
+    });
+  }
+
+  buscador.addEventListener('input', pintarLibros);
+
+  pintarFiltros();
+  pintarLibros();
+
+</script>
+</body>
+</html>
